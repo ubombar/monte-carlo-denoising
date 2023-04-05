@@ -3,7 +3,11 @@ import random
 import math
 
 def generate_random(minimum, maximum):
-    return random.random() * (maximum - minimum) - minimum
+    if minimum == maximum:
+        return minimum
+    
+    x = random.random()
+    return x * (maximum - minimum) + minimum
 
 def generate_material():
     MATERIALS = ["normal", "metal", "plastic", "glass", "light"]
@@ -14,6 +18,7 @@ def generate_kube(range_size: tuple[float], plane: float):
         "type": "kube",
         "pos_x": random.random() * 2 * plane - plane,
         "pos_y": random.random() * 2 * plane - plane,
+        "pos_z": 0.0,
         "size": generate_random(*range_size)
     }
 
@@ -22,16 +27,18 @@ def generate_sphere(range_radius: tuple[float], plane: float):
         "type": "sphere",
         "pos_x": random.random() * 2 * plane - plane,
         "pos_y": random.random() * 2 * plane - plane,
+        "pos_z": 0.0,
         "radius": generate_random(*range_radius)
     }
 
-def generate_cone(range_radius: tuple[float], range_height: tuple[float], plane: float):
+def generate_cone(range_radius1: tuple[float], range_radius2: tuple[float], plane: float):
     return {
         "type": "cone",
         "pos_x": random.random() * 2 * plane - plane,
         "pos_y": random.random() * 2 * plane - plane,
-        "radius": generate_random(*range_radius),
-        "height": generate_random(*range_height)
+        "pos_z": 0.0,
+        "radius1": generate_random(*range_radius1),
+        "radius2": generate_random(*range_radius2)
     }
 
 def generate_light(range_heigth: tuple[float], plane: float):
@@ -45,15 +52,13 @@ def generate_light(range_heigth: tuple[float], plane: float):
 def generate_scene_object(
         id: int,
         plane: float, 
-        fov: float, 
-        range_heigth: tuple[float],
         range_num_kubes: tuple[int],
         range_num_spheres: tuple[int],
         range_num_cones: tuple[int],
         range_kube_size: tuple[float],
         range_sphere_radius: tuple[float],
-        range_cone_radius: tuple[float],
-        range_cone_height: tuple[float],
+        range_cone_radius1: tuple[float],
+        range_cone_radius2: tuple[float],
         range_light_height: tuple[float],
         range_num_lights: tuple[float],
         ):
@@ -65,9 +70,6 @@ def generate_scene_object(
 
     scene = {
         "id": id,
-        "angle": generate_random(0, 2 * math.pi),
-        "height": generate_random(*range_heigth),
-        "fov": fov,
         "num_kubes": num_kubes,
         "num_spheres_kubes": num_spheres_kubes,
         "num_cones": num_cones,
@@ -75,7 +77,7 @@ def generate_scene_object(
         "objects": {
             "kubes": [generate_kube(range_kube_size, plane) for _ in range(num_kubes)],
             "spheres": [generate_sphere(range_sphere_radius, plane) for _ in range(num_spheres_kubes)],
-            "cones": [generate_cone(range_cone_radius, range_cone_height, plane) for _ in range(num_cones)],
+            "cones": [generate_cone(range_cone_radius1, range_cone_radius2, plane) for _ in range(num_cones)],
             "lights": [generate_light(range_light_height, plane) for _ in range(num_lights)],
         }
     }
@@ -93,16 +95,14 @@ if __name__ == "__main__":
     for n in range(N):
         scene = generate_scene_object(
             id=n,
-            plane=100.0, 
-            fov=70.0, 
-            range_heigth=(70, 85),
-            range_num_kubes=(0, 3),
+            plane=10.0, 
+            range_num_kubes=(1, 3),
             range_num_spheres=(0, 3),
             range_num_cones=(0, 3),
-            range_kube_size=(10, 15),
-            range_sphere_radius=(10, 30),
-            range_cone_radius=(10, 15),
-            range_cone_height=(10, 30),
+            range_kube_size=(3, 6),
+            range_sphere_radius=(3, 3),
+            range_cone_radius1=(1, 6),
+            range_cone_radius2=(0, 0),
             range_light_height=(80, 110),
             range_num_lights=(2, 5)
         )
